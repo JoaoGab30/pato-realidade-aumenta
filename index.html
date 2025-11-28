@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- A-Frame e AR.js via CDN -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
@@ -13,8 +14,8 @@
     body { margin: 0; overflow: hidden; }
   </style>
 
-  <!-- Força materiais do modelo a usarem iluminação -->
   <script>
+    // Material realista
     AFRAME.registerComponent('apply-material', {
       init: function () {
         this.el.addEventListener('model-loaded', () => {
@@ -31,15 +32,24 @@
       }
     });
 
-    // Animação suave REAL usando JS
+    // Animação de flutuação suave
     AFRAME.registerComponent('float-anim', {
       tick: function (time) {
         const y = Math.sin(time / 800) * 0.08;
         this.el.object3D.position.y = y;
       }
     });
-  </script>
 
+    // Animação lateral mais rápida e visível
+    AFRAME.registerComponent('side-to-side', {
+      tick: function (time) {
+        const amplitude = 0.4;       // quanto ele se afasta do centro (aumentei)
+        const speed = 500;           // quanto menor, mais rápido
+        const x = Math.sin(time / speed) * amplitude;
+        this.el.object3D.position.x = x;
+      }
+    });
+  </script>
 </head>
 
 <body>
@@ -48,18 +58,16 @@
     arjs="trackingMethod: best; sourceType: webcam;"
     renderer="logarithmicDepthBuffer: true;"
   >
-
     <!-- Luz ambiente -->
     <a-entity light="type: ambient; intensity: 0.5"></a-entity>
 
     <!-- Luz direcional realista -->
-    <a-entity light="type: directional; castShadow: true; intensity: 1"
-              position="1 2 1"></a-entity>
+    <a-entity light="type: directional; castShadow: true; intensity: 1" position="1 2 1"></a-entity>
 
     <!-- Marcador Hiro -->
     <a-marker preset="hiro">
 
-      <!-- Sombra fake (círculo escuro no chão) -->
+      <!-- Sombra no chão -->
       <a-circle 
         radius="0.5"
         rotation="-90 0 0"
@@ -67,13 +75,15 @@
         opacity="0.25">
       </a-circle>
 
-      <!-- Modelo do pato -->
+      <!-- Pato com animação de flutuação e movimento lateral rápido -->
       <a-entity
-        gltf-model="duck.glb"
+        gltf-model="./duck.glb"
         scale="0.6 0.6 0.6"
         apply-material
         float-anim
-      ></a-entity>
+        side-to-side
+      >
+      </a-entity>
 
     </a-marker>
 
